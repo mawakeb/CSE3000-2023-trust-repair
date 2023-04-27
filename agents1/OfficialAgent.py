@@ -172,8 +172,11 @@ class OfficialAgent(ArtificialBrain):
                 if not remainingZones:
                     return None, {}
 
+
                 # Check which victims can be rescued next because human or agent already found them             
                 for vic in remainingVics:
+                    if self._condition == 'complementary':
+                        self._phase = Phase.PICK_UNSEARCHED_ROOM
                     # Define a previously found victim as target victim because all areas have been searched
                     if vic in self._foundVictims and vic in self._todo and self._completedSearch:
                         self._goalVic = vic
@@ -311,7 +314,7 @@ class OfficialAgent(ArtificialBrain):
                         objects.append(info)
                         # Communicate which obstacle is blocking the entrance (EDIT TO ACCOUNT FOR YOUR CONDITIONS)
                         if self._answered == False and not self._remove and not self._waiting:
-                            if self._condition == 'baseline': 
+                            if self._condition == 'baseline' or self._condition == 'complementary':
                                 self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
                                     Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                     \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
@@ -440,9 +443,16 @@ class OfficialAgent(ArtificialBrain):
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue" or "Continue" searching. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                         \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
-                                    self._waiting = True  
+                                    self._waiting = True
 
-                                if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
+                                if self._condition == 'complementary' and self._answered == False and not self._waiting:
+                                    self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please come to rescue the victim now or later. \
+                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ', '') + ' \n • Found: '
+                                        + str(self._foundVictims) + ' \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
+                                    self._waiting = False
+
+
+                            if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                         \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
@@ -464,8 +474,8 @@ class OfficialAgent(ArtificialBrain):
                 if self._door['room_name'] not in self._searchedRooms:
                     self._searchedRooms.append(self._door['room_name'])
                 # Make a plan to rescue a found critically injured victim if the human decides so (EDIT BELOW TO ACCOUNT FOR YOUR CONDITIONS)
-                if self.received_messages_content and self.received_messages_content[-1] == 'Rescue' \
-                or self.received_messages_content and self.received_messages_content[-1] == 'Rescue alone':
+                if self._condition != 'complementary' and self.received_messages_content and self.received_messages_content[-1] == 'Rescue' \
+                or self._condition != 'complementary' and self.received_messages_content and self.received_messages_content[-1] == 'Rescue alone':
                     self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + '.','RescueBot')
                     self._rescue = 'alone'
                     self._answered = True
@@ -489,7 +499,7 @@ class OfficialAgent(ArtificialBrain):
                     self._recentVic = None
                     self._phase = Phase.PLAN_PATH_TO_VICTIM
                 # Continue searching other areas if the human decides so
-                if self.received_messages_content and self.received_messages_content[-1] == 'Continue':
+                if (self.received_messages_content and self.received_messages_content[-1] == 'Continue') or self._condition == 'complementary':
                     self._answered = True
                     self._waiting = False
                     self._todo.append(self._recentVic)

@@ -62,12 +62,18 @@ class RemoveObjectTogether(Action):
             assert kwargs['remove_range'] >= 0  # should be equal or larger than 0
             remove_range = kwargs['remove_range']  # assign
 
+        if condition == 'complementary':
+            return RemoveObjectResult(RemoveObjectResult.OBJECT_ID_NOT_WITHIN_RANGE
+                                      .replace('remove_range'.upper(), str(remove_range))
+                                      .replace('object_id'.upper(), str(object_id)), False)
+
         # get the current agent (exists, otherwise the is_possible failed)
         agent_avatar = grid_world.registered_agents[agent_id]
         agent_loc = agent_avatar.location  # current location
 
         # Get all objects in the remove_range
         objects_in_range = grid_world.get_objects_in_range(agent_loc, object_type="*", sense_range=remove_range)
+
 
         # You can't remove yourself
         objects_in_range.pop(agent_id)
@@ -205,6 +211,7 @@ class Drop(Action):
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
+        # TODO:
         if 'critical' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline' or 'mild' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline':
             return DropObjectResult(DropObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)            
         else:
@@ -273,6 +280,8 @@ class CarryObjectTogether(Action):
         condition = None if 'condition' not in kwargs else kwargs['condition']
 
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
+        if condition == 'complementary':
+            return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
         if object_id and get_distance(other_agent['location'], world_state[object_id]['location']) > grab_range or condition=='baseline':
             return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
         else:

@@ -327,12 +327,14 @@ class HumanBrain(HumanAgentBrain):
             # Set drop range
             action_kwargs['remove_range'] = self.__remove_range
             action_kwargs['condition'] = self.__condition
+            action_kwargs['object_id'] = None
 
             obj_id = \
                 self.__select_random_obj_in_range(state,
                                                   range_=self.__remove_range,
                                                   property_to_check="is_movable")
-            action_kwargs['object_id'] = obj_id
+            if self.__condition != 'complementary':
+                action_kwargs['object_id'] = obj_id
             if obj_id and 'stone' in obj_id:
                 action_kwargs['action_duration'] = 10
             if obj_id and 'rock' in obj_id:
@@ -346,12 +348,13 @@ class HumanBrain(HumanAgentBrain):
             # Set drop range
             action_kwargs['remove_range'] = self.__remove_range
             action_kwargs['condition'] = self.__condition
+            action_kwargs['object_id'] = None
 
             obj_id = \
                 self.__select_random_obj_in_range(state,
                                                   range_=self.__remove_range,
                                                   property_to_check="is_movable")
-            if obj_id and 'critical' not in obj_id and 'mild' not in obj_id and 'healthy' not in obj_id:
+            if self.__condition != 'complementary' and obj_id and 'critical' not in obj_id and 'mild' not in obj_id and 'healthy' not in obj_id:
                 action_kwargs['object_id'] = obj_id
                 if 'stone' in obj_id:
                     action_kwargs['action_duration'] = 30
