@@ -315,8 +315,9 @@ class OfficialAgent(ArtificialBrain):
                         # Communicate which obstacle is blocking the entrance (EDIT TO ACCOUNT FOR YOUR CONDITIONS)
                         if self._answered == False and not self._remove and not self._waiting:
                             if self._condition == 'baseline' or self._condition == 'complementary':
+                                foundWithLoc = list(map(lambda x: str(x) + " in " + self._foundVictimLocs[x]['room'], self._foundVictims))
                                 self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
-                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
+                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(foundWithLoc) +  ' \
                                     \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                             if self._condition == 'opportunisitc':
                                 self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove alone", "Remove together" or "Continue" searching. \
@@ -446,9 +447,11 @@ class OfficialAgent(ArtificialBrain):
                                     self._waiting = True
 
                                 if self._condition == 'complementary' and self._answered == False and not self._waiting:
+                                    foundWithLoc = list(map(lambda x: str(x) + " in " + self._foundVictimLocs[x]['room'], self._foundVictims))
+                                    print(str(foundWithLoc))
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please come to rescue the victim now or later. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ', '') + ' \n • Found: '
-                                        + str(self._foundVictims) + ' \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
+                                        + str(foundWithLoc) + ' \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                     self._waiting = False
 
 

@@ -335,12 +335,12 @@ class HumanBrain(HumanAgentBrain):
                                                   property_to_check="is_movable")
             if self.__condition != 'complementary':
                 action_kwargs['object_id'] = obj_id
-            if obj_id and 'stone' in obj_id:
-                action_kwargs['action_duration'] = 10
-            if obj_id and 'rock' in obj_id:
-                action_kwargs['action_duration'] = 30
-            if obj_id and 'tree' in obj_id:
-                action_kwargs['action_duration'] = 20
+                if obj_id and 'stone' in obj_id:
+                    action_kwargs['action_duration'] = 10
+                if obj_id and 'rock' in obj_id:
+                    action_kwargs['action_duration'] = 30
+                if obj_id and 'tree' in obj_id:
+                    action_kwargs['action_duration'] = 20
         
         # If the user chose to remove an object
         elif action == RemoveObject.__name__:
