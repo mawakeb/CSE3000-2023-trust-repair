@@ -16,7 +16,8 @@ if __name__ == "__main__":
         builder = create_builder(task_type='tutorial', condition='tutorial')
     else:
         # ADD QUESTION ON CONDITION HERE
-        builder = create_builder(task_type='official', condition='baseline')
+        #builder = create_builder(task_type='official', condition='baseline')
+        builder = create_builder(task_type='official', condition='opportunistic')
 
     # Start overarching MATRX scripts and threads, such as the api and/or visualizer if requested. Here we also link our own media resource folder with MATRX.
     media_folder = pathlib.Path().resolve()
