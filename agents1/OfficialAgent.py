@@ -195,7 +195,7 @@ class OfficialAgent(ArtificialBrain):
                         if self._condition == 'opportunistic':
                             self._sendMessage('I will be moving to ' + self._foundVictimLocs[vic][
                                 'room'] + ' to pick up ' + self._goalVic +
-                                '. Please decide whether you plan to "Rescue together" or "Rescue alone"','RescueBot')
+                                '. Please decide whether you want to "Rescue together" or want me to "Rescue alone"','RescueBot')
                             self._rescueWaitingSecond = self._second
                             # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
@@ -216,7 +216,8 @@ class OfficialAgent(ArtificialBrain):
                             self._recue = 'alone'
                         if self._condition == 'opportunistic':
                             self._sendMessage('I will be moving to ' + self._foundVictimLocs[vic][
-                                'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue together" or "Rescue alone"', 'RescueBot')
+                                'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you want to '
+                                                                           '"Rescue together" or want me to "Rescue alone"', 'RescueBot')
                             self._rescueWaitingSecond = self._second
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
@@ -336,6 +337,7 @@ class OfficialAgent(ArtificialBrain):
                     # Explain why the agent is moving to the specific area, either because it containts the current target victim or because it is the closest unsearched area
                     if self._goalVic in self._foundVictims and str(self._door['room_name']) == self._foundVictimLocs[self._goalVic]['room'] and not self._remove:
                         # CAN BE EDITED TO BETTER FIT YOUR CONDITION E.G. "TO PICK UP TOGETHER WITH YOU"
+                        # todo: probably make this optional as well
                         self._sendMessage('Moving to ' + str(self._door['room_name']) + ' to pick up ' + self._goalVic + '.', 'RescueBot')
                     if self._goalVic not in self._foundVictims and not self._remove or not self._goalVic and not self._remove :
                         self._sendMessage('Moving to ' + str(self._door['room_name']) + ' because it is the closest unexplored area.', 'RescueBot')
@@ -389,7 +391,7 @@ class OfficialAgent(ArtificialBrain):
                         if self.received_messages_content and self.received_messages_content[-1] == 'Remove together' and self._condition == 'opportunistic' or self._remove and self._condition == 'opportunistic':
                             if not self._remove:
                                 self._answered = True
-                            # Tell the human to come over and be idle untill human arrives
+                            # Tell the human to come over and be idle until human arrives
                             if not state[{'is_human_agent': True}]:
                                 self._sendMessage('Please come to ' + str(self._door['room_name']) + ' to remove ' + info['obj_id'].split('_')[0] + ' together.','RescueBot')
                                 return None, {}
@@ -491,8 +493,7 @@ class OfficialAgent(ArtificialBrain):
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue" or "Continue" searching. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                         \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
-                                    self._waiting = True  
-
+                                    self._waiting = True
                                 if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
@@ -517,7 +518,7 @@ class OfficialAgent(ArtificialBrain):
                 # Make a plan to rescue a found critically injured victim if the human decides so (EDIT BELOW TO ACCOUNT FOR YOUR CONDITIONS)
                 if self.received_messages_content and self.received_messages_content[-1] == 'Rescue' \
                 or self.received_messages_content and self.received_messages_content[-1] == 'Rescue alone':
-                    self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + '.','RescueBot')
+                    self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + ' alone.','RescueBot')
                     self._rescue = 'alone'
                     self._answered = True
                     self._waiting = False
@@ -546,7 +547,7 @@ class OfficialAgent(ArtificialBrain):
                     self._todo.append(self._recentVic)
                     self._recentVic = None
                     self._phase = Phase.FIND_NEXT_GOAL
-                # Remain idle untill the human communicates to the agent what to do with the found victim
+                # Remain idle until the human communicates to the agent what to do with the found victim
                 if self.received_messages_content and self._waiting and 'Rescue' not in self.received_messages_content[-1] and self.received_messages_content[-1] != 'Continue':
                     return None, {}
                 # Find the next area to search when the agent is not waiting for an answer from the human or occupied with rescuing a victim
