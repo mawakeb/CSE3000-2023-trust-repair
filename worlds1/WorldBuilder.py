@@ -155,7 +155,7 @@ def create_builder(task_type, condition):
         builder.add_object(location=[9,13], is_traversable=True, is_movable=False, name="area 07 sign", img_name="/images/sign07.svg", visualize_depth=110, visualize_size=0.55)
         builder.add_object(location=[15,13], is_traversable=True, is_movable=False, name="area 08 sign", img_name="/images/sign08.svg", visualize_depth=110, visualize_size=0.55)
 
-        builder.add_object(location=[9,0], is_traversable=True, name="keyboard sign", img_name="/images/keyboard-complementary.svg", visualize_depth=110, visualize_size=15)
+        builder.add_object(location=[9,0], is_traversable=True, name="keyboard sign", img_name="/images/keyboard-final.svg", visualize_depth=110, visualize_size=15)
 
         for loc in [(1,1),(2,1),(3,1),(4,1),(5,1),(1,2),(1,3),(1,4),(2,4),(4,4),(5,4),(5,3),(5,2),(7,1),(8,1),
                     (13,1),(14,1),(15,1),(16,1),(17,1),(13,1),(14,1),(15,1),(16,1),(17,1),(13,2),(13,3),(13,4),
@@ -256,7 +256,7 @@ def create_builder(task_type, condition):
         builder.add_object(location=[15,22], is_traversable=True, is_movable=False, name="area 13 sign", img_name="/images/sign13.svg", visualize_depth=110, visualize_size=0.55)
         builder.add_object(location=[21,22], is_traversable=True, is_movable=False, name="area 14 sign", img_name="/images/sign14.svg", visualize_depth=110, visualize_size=0.55)
 
-        builder.add_object(location=[12,0], is_traversable=True, name="keyboard sign", img_name="/images/keyboard-complementary.svg", visualize_depth=110, visualize_size=20)
+        builder.add_object(location=[12,0], is_traversable=True, name="keyboard sign", img_name="/images/keyboard-final.svg", visualize_depth=110, visualize_size=20)
 
         for loc in [(1,1),(2,1),(3,1),(4,1),(5,1),(1,2),(1,3),(1,4),(2,4),(4,4),(5,4),(5,3),(5,2),(7,1),(8,1),(9,1),
                     (10,1),(11,1),(7,2),(7,3),(7,4),(8,4),(11,2),(11,3),(11,4),(10,4),(16,4),(17,4),(17,3),(17,2),
