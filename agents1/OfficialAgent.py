@@ -88,6 +88,8 @@ class OfficialAgent(ArtificialBrain):
         self._timeWaitingForHumanMessage3 = 0
         self._timeWaitingForHumanMessage4 = 0
 
+        self._messageWaitingTick = 0
+
     def initialize(self):
         # Initialization of the state tracker and navigation algorithm
         self._state_tracker = StateTracker(agent_id=self.agent_id)
@@ -117,7 +119,6 @@ class OfficialAgent(ArtificialBrain):
         # for now I assume that human has come and help iff RescueBot and agent is on the same square
         #if(self._isWaitingForHumanToCome and state[self.agent_id]['location'] == state['human']['location']):
         if (self._isWaitingForHumanToCome and state[{'is_human_agent': True}]):
-            print("hi")
             self._isWaitingForHumanToCome = False
 
         # update information about arrival/message waiting if needed
@@ -157,6 +158,12 @@ class OfficialAgent(ArtificialBrain):
             else:
                 self._timeWaitingForHumanToCome4 += 1
             self._saveData(self._tick)
+
+        if(self._isWaitingForHumanMessage and self._messageWaitingTick < 300):
+            self._messageWaitingTick += 1
+        if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 300):
+            self._messageWaitingTick = 0
+            self._sendMessage('Don\'t forget to respond to my message above!', 'RescueBot')
 
         # Check whether human is close in distance
         if state[{'is_human_agent': True}]:
@@ -259,6 +266,7 @@ class OfficialAgent(ArtificialBrain):
                                 '. Please decide whether you want to "Rescue together" or want me to "Rescue alone"','RescueBot')
                             self._rescueWaitingSecond = self._second
                             self._isWaitingForHumanMessage = True
+                            self._messageWaitingTick = 0
                             # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
@@ -282,6 +290,7 @@ class OfficialAgent(ArtificialBrain):
                                                                            '"Rescue together" or want me to "Rescue alone"', 'RescueBot')
                             self._rescueWaitingSecond = self._second
                             self._isWaitingForHumanMessage = True
+                            self._messageWaitingTick = 0
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
@@ -431,11 +440,13 @@ class OfficialAgent(ArtificialBrain):
                                     Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                     \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                 self._isWaitingForHumanMessage = True
+                                self._messageWaitingTick = 0
                             if self._condition == 'opportunistic':
                                 self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove alone", "Remove together" or "Continue" searching. \
                                     Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                     \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                 self._isWaitingForHumanMessage = True
+                                self._messageWaitingTick = 0
                             self._waiting = True     
                         # Determine the next area to explore if the human tells the agent not to remove the obstacle
                         if self.received_messages_content and self.received_messages_content[-1] == 'Continue' and not self._remove:
@@ -566,12 +577,14 @@ class OfficialAgent(ArtificialBrain):
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                         \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                     self._isWaitingForHumanMessage = True
+                                    self._messageWaitingTick = 0
                                     self._waiting = True
                                 if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
                                         Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(self._foundVictims) +  ' \
                                         \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                     self._isWaitingForHumanMessage = True
+                                    self._messageWaitingTick = 0
                                     self._waiting = True  
                     # Execute move actions to explore the area
                     return action, {}
