@@ -74,12 +74,15 @@ class RemoveObjectTogether(Action):
         for obj in objects_in_range:  # loop through all objects in range
             # CURRENTLY FOR ROCK OR STONE BUT CAN BE EDITED
             if obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'rock' in obj and condition!='baseline' or \
-            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'stone' in obj and condition!='baseline':  # if object is in that list
+            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'stone' in obj and condition!='baseline' or \
+            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'tree' in obj and condition!='baseline':  # if object is in that list
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appropriate ActionResult
+                    print("success")
                     return RemoveObjectResult(RemoveObjectResult.OBJECT_REMOVED.replace('object_id'.upper(),
                                                                                         str(object_id)), True)
                 else:  # else we return a failure due to the GridWorld removal failed
+                    print("failure")
                     return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
                                                                                         str(object_id)), False)
 
@@ -211,7 +214,8 @@ class Drop(Action):
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
-        if 'critical' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline' or 'mild' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline':
+        if condition != 'opportunistic' and ('critical' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline' \
+                or 'mild' in obj_id and other_agent.properties['visualization']['opacity']==0 and condition!='baseline'):
             return DropObjectResult(DropObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)            
         else:
             return _possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
@@ -358,7 +362,9 @@ class DropObjectTogether(Action):
             return DropObjectResult(DropObjectResult.RESULT_NO_OBJECT, False)
 
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
-        if 'healthy' in obj_id and other_agent.properties['visualization']['opacity']!=0 or 'mild' in obj_id and other_agent.properties['visualization']['opacity']!=0 or 'critical' in obj_id and other_agent.properties['visualization']['opacity']!=0:
+        if ('healthy' in obj_id and other_agent.properties['visualization']['opacity']!=0 or 'mild' in obj_id and other_agent.properties['visualization']['opacity']!=0 \
+                or 'critical' in obj_id and other_agent.properties['visualization']['opacity']!=0) \
+                and condition != 'opportunistic':
             return DropObjectResult(DropObjectResult.RESULT_UNKNOWN_OBJECT_TYPE, False)            
         else:
             return _possible_drop(grid_world, agent_id=agent_id, obj_id=obj_id, drop_range=drop_range)
