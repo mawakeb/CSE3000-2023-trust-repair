@@ -73,14 +73,16 @@ class RemoveObjectTogether(Action):
         objects_in_range.pop(agent_id)
         for obj in objects_in_range:  # loop through all objects in range
             # CURRENTLY FOR ROCK OR STONE BUT CAN BE EDITED
-            # todo: figure out what this does
             if obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'rock' in obj and condition!='baseline' or \
-            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'stone' in obj and condition!='baseline':  # if object is in that list
+            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'stone' in obj and condition!='baseline' or \
+            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'tree' in obj and condition!='baseline':  # if object is in that list
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appropriate ActionResult
+                    print("success")
                     return RemoveObjectResult(RemoveObjectResult.OBJECT_REMOVED.replace('object_id'.upper(),
                                                                                         str(object_id)), True)
                 else:  # else we return a failure due to the GridWorld removal failed
+                    print("failure")
                     return RemoveObjectResult(RemoveObjectResult.REMOVAL_FAILED.replace('object_id'.upper(),
                                                                                         str(object_id)), False)
 
@@ -133,7 +135,7 @@ class CarryObject(Action):
         max_objects = np.inf if 'max_objects' not in kwargs else kwargs['max_objects']
         condition = None if 'condition' not in kwargs else kwargs['condition']
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
-        if object_id and 'critical' in object_id and condition!='baseline' and condition!='tutorial':
+        if object_id and 'critical' in object_id and condition!='baseline' and condition!='tutorial' and condition != 'opportunistic':
             return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
         if object_id and 'stone' in object_id and condition!='baseline' or object_id and 'rock' in object_id and condition!='baseline' or object_id and 'tree' in object_id and condition!='baseline':
             return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
@@ -275,7 +277,6 @@ class CarryObjectTogether(Action):
         condition = None if 'condition' not in kwargs else kwargs['condition']
 
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
-        # todo: why is it not possible to grab when the condition is baseline
         if object_id and get_distance(other_agent['location'], world_state[object_id]['location']) > grab_range or condition=='baseline':
             return GrabObjectResult(GrabObjectResult.NOT_IN_RANGE, False)
         else:
