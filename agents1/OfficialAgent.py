@@ -750,8 +750,7 @@ class OfficialAgent(ArtificialBrain):
                 if (self.received_messages_content and self.received_messages_content[-1] == 'Rescue' \
                     or self.received_messages_content and self.received_messages_content[
                         -1] == 'Rescue alone') and self._condition != 'mixed':
-                                      'RescueBot')
-                    self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + 'alone.',
+                    self._sendMessage('Picking up ' + self._recentVic + ' in ' + self._door['room_name'] + 'alone.', 'RescueBot')
                     self._rescue = 'alone'
                     self._answered = True
                     self._isWaitingForHumanMessage = False
