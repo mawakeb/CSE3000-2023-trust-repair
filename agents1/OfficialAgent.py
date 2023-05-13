@@ -94,6 +94,7 @@ class OfficialAgent(ArtificialBrain):
 
         self._messageWaitingTick = 0
 
+        self._reminderCount = 1
     def initialize(self):
         # Initialization of the state tracker and navigation algorithm
         self._state_tracker = StateTracker(agent_id=self.agent_id)
@@ -268,6 +269,8 @@ class OfficialAgent(ArtificialBrain):
                                 'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue together" or "Rescue alone".',
                                               'RescueBot')
                             self._rescueWaitingSecond = self._second
+                            self._messageWaitingTick = 0
+                            self._isWaitingForHumanMessage = True
 
                         if self._condition == 'baseline' or self._condition == 'complementary':
                             self._rescue = 'alone'
@@ -304,6 +307,8 @@ class OfficialAgent(ArtificialBrain):
                                 'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue together" or "Rescue alone"',
                                               'RescueBot')
                             self._rescueWaitingSecond = self._second
+                            self._messageWaitingTick = 0
+                            self._isWaitingForHumanMessage = True
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
@@ -373,7 +378,8 @@ class OfficialAgent(ArtificialBrain):
                         self._sendMessage('Picking up ' + self._goalVic + ' in ' + self._door['room_name'] + ' alone.',
                                           'RescueBot')
                         self._rescue = 'alone'
-                        print("here rescue alone")
+                        self._messageWaitingTick = 0
+                        self._isWaitingForHumanMessage = False
                         self._rescueWaitingSecond = -1
                     # If human indicates that he is willing to help, ask him to come help the victim.
                     if self.received_messages_content and self.received_messages_content[
@@ -390,6 +396,7 @@ class OfficialAgent(ArtificialBrain):
                                 self._goalVic) + ' together! Please wait until I moved on top of ' + str(
                                 self._goalVic) + '.', 'RescueBot')
                         self._rescueWaitingSecond = -1
+                        self._isWaitingForHumanMessage = False
                         self._rescueTogether = True
                     return None, {}
                 self._navigator.reset_full()
@@ -466,56 +473,25 @@ class OfficialAgent(ArtificialBrain):
                         objects.append(info)
                         # Communicate which obstacle is blocking the entrance (EDIT TO ACCOUNT FOR YOUR CONDITIONS)
                         if self._answered == False and not self._remove and not self._waiting:
-
                             foundNotRescued = set(self._foundVictims) - set(self._collectedVictims)
-                            foundWithLoc = list(
-                                map(lambda x: str(x) + " in " + self._foundVictimLocs[x]['room'], foundNotRescued))
-
-                            if self._condition == 'baseline':
-                                self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                    self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
-                                                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                    self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(foundWithLoc) + ' \
-                                                                    \n • Rescued: ' + str(self._collectedVictims),
-                                                  'RescueBot')
-                            if self._condition == 'opportunistic':
-                                self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                    self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
-                                                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                    self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(foundWithLoc) + ' \
-                                                                    \n • Rescued: ' + str(self._collectedVictims),
-                                                  'RescueBot')
-                            if self._condition == 'mixed':
-                                if 'tree' in info['obj_id']:
-                                    self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                        self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
-                                                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                        self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                        foundWithLoc) + ' \
-                                                                        \n • Rescued: ' + str(self._collectedVictims),
-                                                      'RescueBot')
-                                if 'rock' in info['obj_id']:
-                                    self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                        self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
-                                                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                        self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                        foundWithLoc) + ' \
-                                                                        \n • Rescued: ' + str(self._collectedVictims),
-                                                      'RescueBot')
-                                if 'stone' in info['obj_id']:
-                                    self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                        self._door['room_name']) + '. Please decide whether to "Remove alone", "Remove together" or "Continue" searching. \
-                                                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                        self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                        foundWithLoc) + ' \
-                                                                        \n • Rescued: ' + str(self._collectedVictims),
-                                                      'RescueBot')
+                            foundWithLoc = list(map(lambda x: str(x) + " in " + self._foundVictimLocs[x]['room'], foundNotRescued))
+                            if self._condition == 'baseline': 
+                                self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove" or "Continue" searching. \
+                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(foundWithLoc) +  ' \
+                                    \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
+                            if self._condition == 'opportunisitc':
+                                self._sendMessage('Found ' + info['obj_id'].split('_')[0] + ' blocking ' + str(self._door['room_name']) + '. Please decide whether to "Remove alone", "Remove together" or "Continue" searching. \
+                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(foundWithLoc) +  ' \
+                                    \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                             self._waiting = True
+                            self._messageWaitingTick = 0
+                            self._isWaitingForHumanMessage = True
                         # Determine the next area to explore if the human tells the agent not to remove the obstacle
                         if self.received_messages_content and self.received_messages_content[
                             -1] == 'Continue' and not self._remove:
                             self._answered = True
                             self._waiting = False
+                            self._isWaitingForHumanMessage = False
                             # Add area to the to do list
                             self._tosearch.append(self._door['room_name'])
                             self._isWaitingForHumanMessage = False
@@ -524,7 +500,7 @@ class OfficialAgent(ArtificialBrain):
                         if self.received_messages_content and self.received_messages_content[
                             -1] == 'Remove' or self._remove or self.received_messages_content and \
                                 self.received_messages_content[-1] == 'Remove alone':
-
+                            self._isWaitingForHumanMessage = False
                             if not self._remove and 'rock' in info['obj_id'] and self._condition == 'mixed':
                                 self._answered = True
                                 self._waiting = False
@@ -575,6 +551,7 @@ class OfficialAgent(ArtificialBrain):
                             -1] == 'Remove together' and (
                                 self._condition == 'opportunistic' or self._condition == 'mixed') or self._remove and (
                                 self._condition == 'opportunistic' or self._condition == 'mixed'):
+                            self._isWaitingForHumanMessage = False
                             if not self._remove:
                                 self._answered = True
                             # Tell the human to come over and be idle until human arrives
@@ -679,54 +656,26 @@ class OfficialAgent(ArtificialBrain):
                                 self._recentVic = vic
                                 # Add the victim and the location to the corresponding dictionary
                                 self._foundVictims.append(vic)
-                                self._foundVictimLocs[vic] = {'location': info['location'],
-                                                              'room': self._door['room_name'], 'obj_id': info['obj_id']}
+                                self._foundVictimLocs[vic] = {'location': info['location'],'room': self._door['room_name'], 'obj_id': info['obj_id']}
                                 foundNotRescued = set(self._foundVictims) - set(self._collectedVictims)
                                 foundWithLoc = list(
                                     map(lambda x: str(x) + " in " + self._foundVictimLocs[x]['room'], foundNotRescued))
-
                                 # Communicate which victim the agent found and ask the human whether to rescue the victim now or at a later stage (EDIT BELOW TO ACCOUNT FOR YOUR CONDITIONS)
                                 if self._condition == 'baseline' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue" or "Continue" searching. \
-                                                                            Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                        self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                        foundWithLoc) + ' \
-                                                                            \n • Rescued: ' + str(
-                                        self._collectedVictims), 'RescueBot')
+                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(foundWithLoc) +  ' \
+                                        \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                     self._waiting = True
+                                    self._messageWaitingTick = 0
+                                    self._isWaitingForHumanMessage = True
 
                                 if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
-                                                                            Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                        self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                        foundWithLoc) + ' \
-                                                                            \n • Rescued: ' + str(
-                                        self._collectedVictims), 'RescueBot')
+                                        Here is some information that might support you in deciding: \n • Explored: area ' + str(self._searchedRooms).replace('area ','') + ' \n • Found: ' + str(foundWithLoc) +  ' \
+                                        \n • Rescued: ' + str(self._collectedVictims), 'RescueBot')
                                     self._waiting = True
-
-                                if self._condition == 'mixed' and self._answered == False and not self._waiting:
-                                    if 'mild' in vic:
-                                        self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
-                                                                                                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                            self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                            foundWithLoc) + ' \
-                                                                                                                    \n • Rescued: ' + str(
-                                            self._collectedVictims), 'RescueBot')
-
-                                        self._waiting = True
-
-                                    if 'critical' in vic:
-                                        self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. You can come rescue the victim. \
-                                                                                                                    Here is some information that might support you in deciding: \n • Explored: area ' + str(
-                                            self._searchedRooms).replace('area ', '') + ' \n • Found: ' + str(
-                                            foundWithLoc) + ' \
-                                                                                                                    \n • Rescued: ' + str(
-                                            self._collectedVictims), 'RescueBot')
-                                        self._waiting = True
-                                        self._answered = True
-                                        self._waiting = False
-                                        self._recentVic = None
-
+                                    self._messageWaitingTick = 0
+                                    self._isWaitingForHumanMessage = True
                     # Execute move actions to explore the area
                     return action, {}
 
@@ -755,6 +704,7 @@ class OfficialAgent(ArtificialBrain):
                     self._answered = True
                     self._isWaitingForHumanMessage = False
                     self._waiting = False
+                    self._isWaitingForHumanMessage = False
                     self._goalVic = self._recentVic
                     self._goalLoc = self._remaining[self._goalVic]
                     self._recentVic = None
@@ -787,6 +737,7 @@ class OfficialAgent(ArtificialBrain):
                     self._rescue = 'together'
                     self._answered = True
                     self._waiting = False
+                    self._isWaitingForHumanMessage = False
                     # Tell the human to come over and help carry the mildly injured victim
                     if not state[{'is_human_agent': True}]:
                         self._sendMessage('Please come to ' + str(self._door['room_name']) + ' to carry ' + str(

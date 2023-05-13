@@ -230,39 +230,45 @@ class HumanBrain(HumanAgentBrain):
         self._tick = state['World']['nr_ticks']
         action = None
         action_kwargs = {}
-        area_tiles = []
-
-        for info in state.values():
-            if 'class_inheritance' in info and 'AreaTile' in info['class_inheritance'] and info[
-                'location'] not in area_tiles:
-                area_tiles.append(info['location'])
+        area_tiles = [(2, 2), (2, 3), (3, 2), (3, 3), (4, 2), (4, 3), (8, 2), (8, 3), (9, 2), (9, 3), (10, 2), (10, 3),
+                      (14, 2), (14, 3), (15, 2), (15, 3), (16, 2), (16, 3), (20, 2), (20, 3),
+                      (21, 2), (21, 3), (22, 2), (22, 3), (2, 8), (2, 9), (3, 8), (3, 9), (4, 8), (4, 9), (8, 8),
+                      (8, 9), (9, 8), (9, 9), (10, 8), (10, 9), (14, 8), (14, 9), (15, 8), (15, 9),
+                      (16, 8), (16, 9), (2, 14), (2, 15), (3, 14), (3, 15), (4, 14), (4, 15), (8, 14), (8, 15), (9, 14),
+                      (9, 15), (10, 14), (10, 15), (14, 14), (14, 15), (15, 14), (15, 15), (16, 14),
+                      (16, 15), (2, 20), (2, 21), (3, 20), (3, 21), (4, 20), (4, 21), (8, 20), (8, 21), (9, 20),
+                      (9, 21), (10, 20), (10, 21), (14, 20), (14, 21), (15, 20), (15, 21), (16, 20),
+                      (16, 21), (20, 20), (20, 21), (21, 20), (21, 21), (22, 20), (22, 21), (23, 8), (23, 9), (23, 10),
+                      (23, 11), (23, 12), (23, 13), (23, 14), (23, 15),
+                      (3, 4), (9, 4), (15, 4), (21, 4), (3, 7), (9, 7), (15, 7), (3, 16), (9, 16), (15, 16), (3, 19),
+                      (9, 19), (15, 19), (21, 19)]
 
         if self.__condition != 'tutorial':
-            if self._tick == 950 or self._tick == 1850 or self._tick == 2750:
+            if self._tick == 1200 or self._tick == 2400 or self._tick == 3600:
                 self.image = self.agent_properties["img_name"]
 
-            if state[{"name": 'human'}]['location'] in area_tiles and self._tick > 950 and self._tick < 1050 or \
-                    state[{"name": 'human'}]['location'] in area_tiles and self._tick > 1850 and self._tick < 1950 or \
-                    state[{"name": 'human'}]['location'] in area_tiles and self._tick > 2750 and self._tick < 2850:
+            if state[{"name": 'human'}]['location'] in area_tiles and self._tick > 1200 and self._tick < 1300 or \
+                    state[{"name": 'human'}]['location'] in area_tiles and self._tick > 2400 and self._tick < 2500 or \
+                    state[{"name": 'human'}]['location'] in area_tiles and self._tick > 3600 and self._tick < 3700:
                 self.image = self.agent_properties["img_name"]
 
-            if state[{"name": 'human'}]['location'] not in area_tiles and self._tick > 950 and self._tick < 1050 or \
+            if state[{"name": 'human'}]['location'] not in area_tiles and self._tick > 1200 and self._tick < 1300 or \
                     state[{"name": 'human'}][
-                        'location'] not in area_tiles and self._tick > 1850 and self._tick < 1950 or \
-                    state[{"name": 'human'}]['location'] not in area_tiles and self._tick > 2750 and self._tick < 2850:
+                        'location'] not in area_tiles and self._tick > 2400 and self._tick < 2500 or \
+                    state[{"name": 'human'}]['location'] not in area_tiles and self._tick > 3600 and self._tick < 3700:
                 self.agent_properties["img_name"] = "/images/human-danger2.gif"
                 self.agent_properties["visualize_size"] = 2
                 return None, {}
 
-            if self._tick == 1050:
+            if self._tick == 1300:
                 self.agent_properties["img_name"] = str(self.image)
                 self.agent_properties["visualize_size"] = 1
 
-            if self._tick == 1950:
+            if self._tick == 2500:
                 self.agent_properties["img_name"] = str(self.image)
                 self.agent_properties["visualize_size"] = 1
 
-            if self._tick == 2850:
+            if self._tick == 3700:
                 self.agent_properties["img_name"] = str(self.image)
                 self.agent_properties["visualize_size"] = 1
 
@@ -371,10 +377,7 @@ class HumanBrain(HumanAgentBrain):
             if obj_id and 'critical' not in obj_id and 'mild' not in obj_id and 'healthy' not in obj_id:
                 action_kwargs['object_id'] = obj_id
                 if 'stone' in obj_id:
-                    if self.__condition == 'mixed':  # soft interdependence -> removing stone takes a lot alone
-                        action_kwargs['action_duration'] = 40
-                    else:
-                        action_kwargs['action_duration'] = 40
+                    action_kwargs['action_duration'] = 40
                 if 'rock' in obj_id:
                     if self.__condition != 'mixed':  # hard interdependence -> removing rock can only be done together
                        action_kwargs['action_duration'] = 120

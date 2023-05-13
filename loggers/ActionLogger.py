@@ -32,4 +32,13 @@ class ActionLogger(GridWorldLogger):
                 if message.from_id == 'rescuebot' and message.to_id == 'human':
                     log_data["rescuebot_sent_messages_nr"] += 1
                 
+                # optional: filter only specific types of messages or specific agents here
+
+                # Log the message content for the sender and receiver
+                if message.from_id == 'human' and message.to_id == 'rescuebot':
+                    log_data["human_sent_messages_nr"] += 1
+
+                if message.from_id == 'rescuebot' and message.to_id == 'human':
+                    log_data["rescuebot_sent_messages_nr"] += 1
+                
         return log_data

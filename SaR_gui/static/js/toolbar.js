@@ -554,9 +554,10 @@ function add_message(chatroom_ID, mssg) {
 
     if (mssg_content.includes("Current tick is")) {
         var tick = Number(mssg_content.split(/[, ]+/).pop());
-        if (tick == 1100 || tick == 2000 || tick == 2900) { 
+        if (tick == 1450 || tick == 2550 || tick == 3750) {
             toggle_pause();
     }}
+
 
     var div = document.createElement("div");
     div.className = "message_you"; // by default assume we sent this message
@@ -571,11 +572,30 @@ function add_message(chatroom_ID, mssg) {
         mssg_sender.className = "chat-mssg-sender";
         mssg_sender.appendChild(document.createTextNode(mssg.from_id + ": "));
         div.appendChild(mssg_sender);
+
     }
 
     // add the message text to the message div
     if (!mssg_content.includes("Our score is") && !mssg_content.includes("Current tick is")) {
     var content = document.createElement('span');
+    if (mssg_content.includes("Please decide whether to")) {
+        const audio_message = new Audio("https://www.fesliyanstudios.com/play-mp3/387");
+        audio_message.play();
+        audio_message.onended = function () {
+            audio_message.pause()
+        };
+    }
+
+    if (mssg_content.includes("I have detected") || mssg_content.includes("advice was correct") ||
+        mssg_content.includes("advice was incorrect")) {
+        const audio_message = new Audio("https://www.fesliyanstudios.com/play-mp3/371");
+        audio_message.play();
+        audio_message.onended = function () {
+            audio_message.pause()
+        };
+    }
+
+
     content.className = "chat-content";
     content.innerHTML = mssg_content;
     div.appendChild(content);
@@ -585,8 +605,9 @@ function add_message(chatroom_ID, mssg) {
     mssgs_container.appendChild(div);
     
     // scroll to the new message
-//    scrollSmoothToBottom(mssgs_container)
+    // scrollSmoothToBottom(mssgs_container)
     scrollToBottom(mssgs_container);
+
 }
 }
 
