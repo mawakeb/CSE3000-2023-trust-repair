@@ -223,11 +223,11 @@ class OfficialAgent(ArtificialBrain):
                             self._isWaitingForHumanMessage = True
                             self._messageWaitingTick = 0
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if self._condition != 'complementary' and 'location' in self._foundVictimLocs[vic].keys():
+                        if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
                             return Idle.__name__, {'duration_in_ticks': 25}
                         # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
-                        if self._condition != 'complementary' and 'location' not in self._foundVictimLocs[vic].keys():
+                        if 'location' not in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_ROOM
                             return Idle.__name__, {'duration_in_ticks': 25}
                     # Define a previously found victim as target victim
@@ -248,7 +248,7 @@ class OfficialAgent(ArtificialBrain):
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if self._condition != 'complementary' and 'location' in self._foundVictimLocs[vic].keys():
+                        if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
                             return Idle.__name__, {'duration_in_ticks': 25}
                         # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
@@ -428,50 +428,18 @@ class OfficialAgent(ArtificialBrain):
                             -1] == 'Remove' or self._remove or self.received_messages_content and \
                                 self.received_messages_content[-1] == 'Remove alone':
                             self._isWaitingForHumanMessage = False
-                            if not self._remove and 'rock' in info['obj_id'] and self._condition == 'mixed':
-                                self._answered = True
-                                self._waiting = False
-                                # Tell the human to come over and be idle until human arrives
-                                if not state[{'is_human_agent': True}]:
-                                    self._sendMessage('Please come to ' + str(self._door['room_name']) + ' to remove ' +
-                                                      info['obj_id'].split('_')[0] + ' together.', 'RescueBot')
-                                    return None, {}
-                                # Tell the human to remove the obstacle when he/she arrives
-                                if state[{'is_human_agent': True}]:
-                                    self._sendMessage(
-                                        'Lets remove ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                            self._door['room_name']) + '!', 'RescueBot')
-                                    return None, {}
 
                             if not self._remove:
                                 self._answered = True
                                 self._waiting = False
                                 self._sendMessage('Removing ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
                                     self._door['room_name']) + '.', 'RescueBot')
-
-                                self._phase = Phase.ENTER_ROOM
-                                self._remove = False
-                                return RemoveObject.__name__, {'object_id': info['obj_id'],
-                                                               'condition': self._condition}
-
-                            if self._remove and 'tree' in info['obj_id'] and self._condition == 'mixed':
+                            if self._remove:
                                 self._sendMessage('Removing ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
                                     self._door['room_name']) + ' because you asked me to.', 'RescueBot')
-                                self._phase = Phase.ENTER_ROOM
-                                self._remove = False
-                                return RemoveObject.__name__, {'object_id': info['obj_id'],
-                                                               'condition': self._condition}
-
-                            if self._remove and ('stone' in info['obj_id'] or 'rock' in info[
-                                'obj_id']) and self._condition == 'mixed':
-                                self._sendMessage(
-                                    'Helping you remove ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                        self._door['room_name']) + ' because you asked me to.', 'RescueBot')
-                                if state[{'is_human_agent': True}]:
-                                    self._sendMessage(
-                                        'Lets remove ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
-                                            self._door['room_name']) + '!', 'RescueBot')
-                                    return None, {}
+                            self._phase = Phase.ENTER_ROOM
+                            self._remove = False
+                            return RemoveObject.__name__, {'object_id': info['obj_id'], 'condition': self._condition}
 
                         # Remove the obstacle together if the human decides so
                         if self.received_messages_content and self.received_messages_content[
@@ -558,7 +526,7 @@ class OfficialAgent(ArtificialBrain):
                                 # Add the exact victim location to the corresponding dictionary
                                 self._foundVictimLocs[vic] = {'location': info['location'],
                                                               'room': self._door['room_name'], 'obj_id': info['obj_id']}
-                                if self._condition != 'complementary' and vic == self._goalVic:
+                                if vic == self._goalVic:
                                     # Communicate which victim was found
                                     self._sendMessage('Found ' + vic + ' in ' + self._door[
                                         'room_name'] + ' because you told me ' + vic + ' was located here.',
@@ -754,7 +722,7 @@ class OfficialAgent(ArtificialBrain):
 
             if Phase.FOLLOW_PATH_TO_VICTIM == self._phase:
                 # Start searching for other victims if the human already rescued the target victim
-                if self._goalVic and self._goalVic in self._collectedVictims:
+                if (self._goalVic and self._goalVic in self._collectedVictims) or (self._condition == 'complementary'):
                     self._phase = Phase.FIND_NEXT_GOAL
                 # Otherwise, move towards the location of the found victim
                 else:
@@ -807,7 +775,7 @@ class OfficialAgent(ArtificialBrain):
                         self._phase = Phase.FIND_NEXT_GOAL
 
                 # When rescuing injured victims alone, pick the victim up and plan the path to the drop zone
-                if ('mild' in self._goalVic and self._rescue == 'alone' and self._condition != 'complementary') or self._condition == 'baseline':
+                if ('mild' in self._goalVic and self._rescue == 'alone') or self._condition == 'baseline':
                     self._phase = Phase.PLAN_PATH_TO_DROPPOINT
                     if self._goalVic not in self._collectedVictims:
                         self._collectedVictims.append(self._goalVic)
