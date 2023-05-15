@@ -548,13 +548,13 @@ function add_message(chatroom_ID, mssg) {
 
     if (mssg_content.includes("Current tick is")) {
         var tick = Number(mssg_content.split(/[, ]+/).pop());
-        if (tick == 4800) {
+        if (tick == 6000) {
             toggle_stop();
     }}
 
     if (mssg_content.includes("Current tick is")) {
         var tick = Number(mssg_content.split(/[, ]+/).pop());
-        if (tick == 1450 || tick == 2550 || tick == 3750) {
+        if (tick == 1500 || tick == 2600 || tick == 3800) {
             toggle_pause();
     }}
 
@@ -579,7 +579,7 @@ function add_message(chatroom_ID, mssg) {
     if (!mssg_content.includes("Our score is") && !mssg_content.includes("Current tick is")) {
     var content = document.createElement('span');
     if (mssg_content.includes("Please decide whether to")) {
-        const audio_message = new Audio("https://www.fesliyanstudios.com/play-mp3/387");
+        const audio_message = new Audio("/static/sound/notification.mp3");
         audio_message.play();
         audio_message.onended = function () {
             audio_message.pause()
@@ -588,13 +588,12 @@ function add_message(chatroom_ID, mssg) {
 
     if (mssg_content.includes("I have detected") || mssg_content.includes("advice was correct") ||
         mssg_content.includes("advice was incorrect")) {
-        const audio_message = new Audio("https://www.fesliyanstudios.com/play-mp3/371");
+        const audio_message = new Audio("/static/sound/notification.mp3");
         audio_message.play();
         audio_message.onended = function () {
             audio_message.pause()
         };
     }
-
 
     content.className = "chat-content";
     content.innerHTML = mssg_content;
