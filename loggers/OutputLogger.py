@@ -164,7 +164,7 @@ def output_logger(fld):
                 'idle1','idle2','idle3','idle4',
                 'human_sent_messages_nr1','human_sent_messages_nr2','human_sent_messages_nr3','human_sent_messages_nr4',
                 'number_joint_1', 'number_joint_2', 'number_joint_3', 'number_joint_4',
-                'number_alone_1', 'number_alone_2', 'number_alone_3', 'number_alone_4', 'joint', 'indiv'
+                'number_alone_1', 'number_alone_2', 'number_alone_3', 'number_alone_4'
             ]
         )
         csv_writer.writerow(
@@ -176,6 +176,6 @@ def output_logger(fld):
                 len(joint_actions_1), len(joint_actions_2), len(joint_actions_3),
                 len(joint_actions_4),
                 len(individual_actions_1), len(individual_actions_2),
-                len(individual_actions_3), len(individual_actions_4), joint_actions, individual_actions
+                len(individual_actions_3), len(individual_actions_4)
             ]
         )
