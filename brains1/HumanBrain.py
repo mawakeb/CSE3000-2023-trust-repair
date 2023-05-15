@@ -322,12 +322,11 @@ class HumanBrain(HumanAgentBrain):
                                                   property_to_check="is_movable")
             if obj_id and 'healthy' in obj_id:
                 action_kwargs['object_id'] = obj_id
+
             if obj_id and 'mild' in obj_id:
                 action_kwargs['object_id'] = obj_id
-                if self.__condition == 'mixed':
-                    action_kwargs['action_duration'] = 10  # no-constraints: carried together does not improve time
-                else:
-                    action_kwargs['action_duration'] = 40
+                action_kwargs['action_duration'] = 40
+
             if obj_id and 'critical' in obj_id:
                 action_kwargs['object_id'] = obj_id
                 action_kwargs['action_duration'] = 80
@@ -351,14 +350,18 @@ class HumanBrain(HumanAgentBrain):
                 self.__select_random_obj_in_range(state,
                                                   range_=self.__remove_range,
                                                   property_to_check="is_movable")
-            action_kwargs['object_id'] = obj_id
+
             if obj_id and 'stone' in obj_id:
                 action_kwargs['action_duration'] = 10
+                action_kwargs['object_id'] = obj_id
+
             if obj_id and 'rock' in obj_id:
                 action_kwargs['action_duration'] = 30
-            if obj_id and 'tree' in obj_id:
-                if self.__condition != 'mixed': # MIXED: human can not remove tree at all
-                    action_kwargs['action_duration'] = 20
+                action_kwargs['object_id'] = obj_id
+
+            if obj_id and 'tree' in obj_id and self.__condition != 'mixed':
+                action_kwargs['object_id'] = obj_id
+                action_kwargs['action_duration'] = 20
 
         # If the user chose to remove an object
         elif action == RemoveObject.__name__:
@@ -376,12 +379,12 @@ class HumanBrain(HumanAgentBrain):
                 action_kwargs['object_id'] = obj_id
                 if 'stone' in obj_id:
                     action_kwargs['action_duration'] = 40
-                if 'rock' in obj_id:
-                    if self.__condition != 'mixed':  # hard interdependence -> removing rock can only be done together
-                       action_kwargs['action_duration'] = 120
-                if 'tree' in obj_id:
-                    if self.__condition != 'mixed':  # user can not remove tree -> dependence on robot to remove it
-                        action_kwargs['action_duration'] = 80
+                if obj_id and 'rock' in obj_id and self.__condition != 'mixed':
+                    action_kwargs['object_id'] = obj_id
+                    action_kwargs['action_duration'] = 120
+                if obj_id and 'tree' in obj_id and self.__condition != 'mixed':
+                    action_kwargs['object_id'] = obj_id
+                    action_kwargs['action_duration'] = 80
 
         # if the user chose to do an open or close door action, find a door to
         # open/close within range

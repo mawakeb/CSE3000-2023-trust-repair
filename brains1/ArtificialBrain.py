@@ -656,10 +656,7 @@ class ArtificialBrain(ArtificialAgentBrain, ABC):
                 params['action_duration'] = 120
         # define duration to pick up a mildly injured victim by agent
         if act == 'CarryObject' and 'mild' in params['object_id']:
-            if self.__condition == 'mixed':
-                params['action_duration'] = 10
-            else:
-                params['action_duration'] = 40
+            params['action_duration'] = 40
         # define duration to pick up a mildly injured victim by agent
         if act == 'CarryObject' and 'critical' in params['object_id']:
             params['action_duration'] = 80
