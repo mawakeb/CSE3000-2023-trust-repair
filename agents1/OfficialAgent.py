@@ -204,61 +204,62 @@ class OfficialAgent(ArtificialBrain):
                 if not remainingZones:
                     return None, {}
 
+                if self._condition == 'complementary':
+                    self._phase = Phase.PICK_UNSEARCHED_ROOM
 
-                # Check which victims can be rescued next because human or agent already found them             
-                for vic in remainingVics:
-                    if self._condition == 'complementary':
-                        self._phase = Phase.PICK_UNSEARCHED_ROOM
-                    # Define a previously found victim as target victim because all areas have been searched
-                    if vic in self._foundVictims and vic in self._todo and self._completedSearch:
-                        self._goalVic = vic
-                        self._goalLoc = remaining[vic]
-                        # Move to target victim and ask for help depending on condition. EDIT BASED ON YOUR CONDITION
-                        if self._condition == 'required':# or self._condition == 'opportunistic' or self._condition == 'mixed':
-                            self._rescue = 'together'
-                            # self._sendMessage('Moving to ' + self._foundVictimLocs[vic]['room'] + ' to pick up ' + self._goalVic +'. Please come there as well to help me carry ' + self._goalVic + ' to the drop zone.', 'RescueBot')
-                        if self._condition == 'baseline' or self._condition == 'complementary':
-                            self._rescue = 'alone'
-                            # self._sendMessage('Moving to ' + self._foundVictimLocs[vic]['room'] + ' to pick up ' + self._goalVic +'.', 'RescueBot')
-                            self._isWaitingForHumanMessage = True
-                            self._messageWaitingTick = 0
-                        # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if 'location' in self._foundVictimLocs[vic].keys():
-                            self._phase = Phase.PLAN_PATH_TO_VICTIM
-                            return Idle.__name__, {'duration_in_ticks': 25}
-                        # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
-                        if 'location' not in self._foundVictimLocs[vic].keys():
-                            self._phase = Phase.PLAN_PATH_TO_ROOM
-                            return Idle.__name__, {'duration_in_ticks': 25}
-                    # Define a previously found victim as target victim
-                    if vic in self._foundVictims and vic not in self._todo:
-                        if self._condition == 'mixed' and 'critical' in vic:
+                if self._condition != 'complementary':
+                    # Check which victims can be rescued next because human or agent already found them
+                    for vic in remainingVics:
+                        # Define a previously found victim as target victim because all areas have been searched
+                        if vic in self._foundVictims and vic in self._todo and self._completedSearch:
+                            self._goalVic = vic
+                            self._goalLoc = remaining[vic]
+                            # Move to target victim and ask for help depending on condition. EDIT BASED ON YOUR CONDITION
+                            if self._condition == 'required':# or self._condition == 'opportunistic' or self._condition == 'mixed':
+                                self._rescue = 'together'
+                                # self._sendMessage('Moving to ' + self._foundVictimLocs[vic]['room'] + ' to pick up ' + self._goalVic +'. Please come there as well to help me carry ' + self._goalVic + ' to the drop zone.', 'RescueBot')
+                            if self._condition == 'baseline':
+                                self._rescue = 'alone'
+                                # self._sendMessage('Moving to ' + self._foundVictimLocs[vic]['room'] + ' to pick up ' + self._goalVic +'.', 'RescueBot')
+                                self._isWaitingForHumanMessage = True
+                                self._messageWaitingTick = 0
+                            # Plan path to victim because the exact location is known (i.e., the agent found this victim)
+                            if 'location' in self._foundVictimLocs[vic].keys():
+                                self._phase = Phase.PLAN_PATH_TO_VICTIM
+                                return Idle.__name__, {'duration_in_ticks': 25}
+                            # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
+                            if 'location' not in self._foundVictimLocs[vic].keys():
+                                self._phase = Phase.PLAN_PATH_TO_ROOM
+                                return Idle.__name__, {'duration_in_ticks': 25}
+                        # Define a previously found victim as target victim
+                        if vic in self._foundVictims and vic not in self._todo:
+                            if self._condition == 'mixed' and 'critical' in vic:
+                                self._phase = Phase.PICK_UNSEARCHED_ROOM
+                                continue
+                            self._goalVic = vic
+                            self._goalLoc = remaining[vic]
+                            # Decide whether to rescue alone or together based on condition
+                            if self._condition == 'baseline' or self._condition == 'complementary':
+                                self._rescue = 'alone'
+                            if self._condition == 'mixed':
+                                self._sendMessage('Moving to ' + self._foundVictimLocs[vic][
+                                    'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue together" or "Rescue alone"',
+                                                  'RescueBot')
+                                self._rescueWaitingSecond = self._second
+                                self._messageWaitingTick = 0
+                                self._isWaitingForHumanMessage = True
+                            # Plan path to victim because the exact location is known (i.e., the agent found this victim)
+                            if 'location' in self._foundVictimLocs[vic].keys():
+                                self._phase = Phase.PLAN_PATH_TO_VICTIM
+                                return Idle.__name__, {'duration_in_ticks': 25}
+                            # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
+                            if 'location' not in self._foundVictimLocs[vic].keys():
+                                self._phase = Phase.PLAN_PATH_TO_ROOM
+                                return Idle.__name__, {'duration_in_ticks': 25}
+                        # If there are no target victims found, visit an unsearched area to search for victims
+                        if vic not in self._foundVictims or vic in self._foundVictims and vic in self._todo and len(
+                                self._searchedRooms) > 0:
                             self._phase = Phase.PICK_UNSEARCHED_ROOM
-                            continue
-                        self._goalVic = vic
-                        self._goalLoc = remaining[vic]
-                        # Decide whether to rescue alone or together based on condition
-                        if self._condition == 'baseline' or self._condition == 'complementary':
-                            self._rescue = 'alone'
-                        if self._condition == 'mixed':
-                            self._sendMessage('Moving to ' + self._foundVictimLocs[vic][
-                                'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue together" or "Rescue alone"',
-                                              'RescueBot')
-                            self._rescueWaitingSecond = self._second
-                            self._messageWaitingTick = 0
-                            self._isWaitingForHumanMessage = True
-                        # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if 'location' in self._foundVictimLocs[vic].keys():
-                            self._phase = Phase.PLAN_PATH_TO_VICTIM
-                            return Idle.__name__, {'duration_in_ticks': 25}
-                        # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
-                        if 'location' not in self._foundVictimLocs[vic].keys():
-                            self._phase = Phase.PLAN_PATH_TO_ROOM
-                            return Idle.__name__, {'duration_in_ticks': 25}
-                    # If there are no target victims found, visit an unsearched area to search for victims
-                    if vic not in self._foundVictims or vic in self._foundVictims and vic in self._todo and len(
-                            self._searchedRooms) > 0:
-                        self._phase = Phase.PICK_UNSEARCHED_ROOM
 
             if Phase.PICK_UNSEARCHED_ROOM == self._phase:
                 agent_location = state[self.agent_id]['location']
@@ -544,7 +545,7 @@ class OfficialAgent(ArtificialBrain):
                                     self._goalVic = self._recentVic
                                     self._goalLoc = self._remaining[self._goalVic]
                                     self._recentVic = None
-                                    self._phase = Phase.PLAN_PATH_TO_VICTIM
+                                    self._phase = Phase.FIND_NEXT_GOAL
 
                             # Identify injured victim in the area
                             if 'healthy' not in vic and vic not in self._foundVictims:
