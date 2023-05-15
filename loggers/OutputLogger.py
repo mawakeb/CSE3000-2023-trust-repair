@@ -56,7 +56,8 @@ def output_logger(fld):
                 '(3, 4)', '(9, 4)', '(15, 4)', '(21, 4)', '(3, 7)', '(9, 7)', '(15, 7)', '(3, 16)', '(9, 16)', '(15, 16)', '(3, 19)', '(9, 19)', '(15, 19)', '(21, 19)']
     with open(action_file) as csvfile:
         reader = csv.reader(csvfile, delimiter=';', quotechar="'")
-        for row in reader:
+        reader = list(reader)
+        for i, row in enumerate(reader):
             if not gameHasStarted and 'Move' in row[4]:
                 gameHasStarted = True
             if action_header==[]:
@@ -68,30 +69,44 @@ def output_logger(fld):
                 unique_human_actions.append(row[4:6])
             if row[4] == 'RemoveObjectTogether' or row[4] == 'CarryObjectTogether' or row[4] == 'DropObjectTogether':
                 if row[4:6] not in joint_actions:
-                    joint_actions.append(row[4:6])
-                    if int(row[9]) <= 1200:
-                        joint_actions_1.append(row[4:6])
-                    if 1200 < int(row[9]) <= 2400:
-                        joint_actions_2.append(row[4:6])
-                    if 2400 < int(row[9]) <= 3600:
-                        joint_actions_3.append(row[4:6])
-                    if 3600 < int(row[9]):
-                        joint_actions_4.append(row[4:6])
+                    count = 0
+                    for j in range(i + 1, i + 4):
+                        if j < len(reader) and reader[j][4] == row[4] and reader[j][5] == row[5]:
+                            count += 1
+                        else:
+                            break
+                    if count == 3:
+                        joint_actions.append(row[4:6])
+                        if int(row[9]) <= 1200:
+                            joint_actions_1.append(row[4:6])
+                        if 1200 < int(row[9]) <= 2400:
+                            joint_actions_2.append(row[4:6])
+                        if 2400 < int(row[9]) <= 3600:
+                            joint_actions_3.append(row[4:6])
+                        if 3600 < int(row[9]):
+                            joint_actions_4.append(row[4:6])
 
                 if row[4:6] not in unique_agent_actions:
                     unique_agent_actions.append(row[4:6])
 
             if row[4] == 'RemoveObject' or row[4] == 'CarryObject' or row[4] == 'Drop':
                 if row[4:6] not in individual_actions:
-                    individual_actions.append(row[4:6])
-                    if int(row[9]) <= 1200:
-                        individual_actions_1.append(row[4:6])
-                    if 1200 < int(row[9]) <= 2400:
-                        individual_actions_2.append(row[4:6])
-                    if 2400 < int(row[9]) <= 3600:
-                        individual_actions_3.append(row[4:6])
-                    if 3600 < int(row[9]):
-                        individual_actions_4.append(row[4:6])
+                    count = 0
+                    for j in range(i + 1, i + 4):
+                        if j < len(reader) and reader[j][4] == row[4] and reader[j][5] == row[5]:
+                            count += 1
+                        else:
+                            break
+                    if count == 3:
+                        individual_actions.append(row[4:6])
+                        if int(row[9]) <= 1200:
+                            individual_actions_1.append(row[4:6])
+                        if 1200 < int(row[9]) <= 2400:
+                            individual_actions_2.append(row[4:6])
+                        if 2400 < int(row[9]) <= 3600:
+                            individual_actions_3.append(row[4:6])
+                        if 3600 < int(row[9]):
+                            individual_actions_4.append(row[4:6])
 
                 if row[4:6] not in unique_agent_actions:
                     unique_agent_actions.append(row[4:6])
