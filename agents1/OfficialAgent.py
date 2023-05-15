@@ -223,11 +223,11 @@ class OfficialAgent(ArtificialBrain):
                             self._isWaitingForHumanMessage = True
                             self._messageWaitingTick = 0
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if 'location' in self._foundVictimLocs[vic].keys():
+                        if self._condition != 'complementary' and 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
                             return Idle.__name__, {'duration_in_ticks': 25}
                         # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
-                        if 'location' not in self._foundVictimLocs[vic].keys():
+                        if self._condition != 'complementary' and 'location' not in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_ROOM
                             return Idle.__name__, {'duration_in_ticks': 25}
                     # Define a previously found victim as target victim
@@ -248,7 +248,7 @@ class OfficialAgent(ArtificialBrain):
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
-                        if 'location' in self._foundVictimLocs[vic].keys():
+                        if self._condition != 'complementary' and 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
                             return Idle.__name__, {'duration_in_ticks': 25}
                         # Plan path to area because the exact victim location is not known, only the area (i.e., human found this  victim)
@@ -558,7 +558,7 @@ class OfficialAgent(ArtificialBrain):
                                 # Add the exact victim location to the corresponding dictionary
                                 self._foundVictimLocs[vic] = {'location': info['location'],
                                                               'room': self._door['room_name'], 'obj_id': info['obj_id']}
-                                if vic == self._goalVic:
+                                if self._condition != 'complementary' and vic == self._goalVic:
                                     # Communicate which victim was found
                                     self._sendMessage('Found ' + vic + ' in ' + self._door[
                                         'room_name'] + ' because you told me ' + vic + ' was located here.',
@@ -807,7 +807,7 @@ class OfficialAgent(ArtificialBrain):
                         self._phase = Phase.FIND_NEXT_GOAL
 
                 # When rescuing injured victims alone, pick the victim up and plan the path to the drop zone
-                if ('mild' in self._goalVic and self._rescue == 'alone') or self._condition == 'baseline':
+                if ('mild' in self._goalVic and self._rescue == 'alone' and self._condition != 'complementary') or self._condition == 'baseline':
                     self._phase = Phase.PLAN_PATH_TO_DROPPOINT
                     if self._goalVic not in self._collectedVictims:
                         self._collectedVictims.append(self._goalVic)

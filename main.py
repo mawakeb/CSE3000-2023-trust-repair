@@ -12,8 +12,6 @@ if __name__ == "__main__":
     fld = os.getcwd()
     print("\nEnter one of the task types 'tutorial' or 'official':")
     choice1=input()
-    print("\nEnter one of the condition types 'baseline' or 'mixed':")
-    choice2 = input()
     if choice1=='tutorial':
         builder = create_builder(task_type='tutorial', condition='tutorial')
     else:
