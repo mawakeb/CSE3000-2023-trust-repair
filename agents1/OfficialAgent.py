@@ -498,7 +498,7 @@ class OfficialAgent(ArtificialBrain):
                                 return RemoveObject.__name__, {'object_id': info['obj_id'],
                                                                'condition': self._condition}
 
-                            if self._remove and 'tree' in info['obj_id'] and self._condition == 'mixed' and self._condition != 'required':
+                            if self._remove and 'tree' in info['obj_id'] and (self._condition == 'mixed' or self._condition == 'baseline') and self._condition != 'required':
                                 self._sendMessage('Removing ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
                                     self._door['room_name']) + ' because you asked me to.', 'RescueBot')
                                 self._phase = Phase.ENTER_ROOM
