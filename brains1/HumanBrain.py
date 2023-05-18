@@ -279,6 +279,14 @@ class HumanBrain(HumanAgentBrain):
         pressed_keys = user_input[-1]
         action = self.key_action_map[pressed_keys]
 
+        # REQUIRED: human cannot carry, drop or remove alone
+        if self.__condition == 'required' and (action == CarryObject.__name__ or action == Drop.__name__ or action == action == RemoveObject.__name__):
+            return None, {}
+        
+        # BASELINE: human cannot carry, drop or remove together
+        if self.__condition == 'baseline' and (action == CarryObjectTogether.__name__ or action == DropObjectTogether.__name__ or action == action == RemoveObjectTogether.__name__):
+            return None, {}
+        
         # if the user chose a grab together action, choose an object within grab_range
         if action == CarryObjectTogether.__name__:
             # Set grab range
