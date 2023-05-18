@@ -123,20 +123,18 @@ class OfficialAgent(ArtificialBrain):
         # Process messages from team members
         self._processMessages(state, self._teamMembers)
 
-        # for now I assume that human has come and help iff RescueBot and agent is on the same square
-        #if(self._isWaitingForHumanToCome and state[self.agent_id]['location'] == state['human']['location']):
         if (self._isWaitingForHumanToCome and state[{'is_human_agent': True}]):
             self._isWaitingForHumanToCome = False
 
         # update information about arrival/message waiting if needed
-        if(self._isWaitingForHumanMessage and self._isWaitingForHumanToCome):
-            if (self._tick <= 1100):
-               self._timeWaitingForHumanMessage1 += 1
-               self._timeWaitingForHumanToCome1 += 1
-            elif (self._tick > 1100 and self._tick <= 2000):
+        if (self._isWaitingForHumanMessage and self._isWaitingForHumanToCome):
+            if (self._tick <= 1200):
+                self._timeWaitingForHumanMessage1 += 1
+                self._timeWaitingForHumanToCome1 += 1
+            elif (self._tick > 1200 and self._tick <= 2400):
                 self._timeWaitingForHumanMessage2 += 1
                 self._timeWaitingForHumanToCome2 += 1
-            elif (self._tick > 2000 and self._tick <= 2900):
+            elif (self._tick > 2400 and self._tick <= 3600):
                 self._timeWaitingForHumanMessage3 += 1
                 self._timeWaitingForHumanToCome3 += 1
             else:
@@ -145,22 +143,22 @@ class OfficialAgent(ArtificialBrain):
             self._saveData(self._tick)
 
         if (self._isWaitingForHumanMessage and not self._isWaitingForHumanToCome):
-            if (self._tick <= 1100):
+            if (self._tick <= 1200):
                 self._timeWaitingForHumanMessage1 += 1
-            elif (self._tick > 1100 and self._tick <= 2000):
+            elif (self._tick > 1200 and self._tick <= 2400):
                 self._timeWaitingForHumanMessage2 += 1
-            elif (self._tick > 2000 and self._tick <= 2900):
+            elif (self._tick > 2400 and self._tick <= 3600):
                 self._timeWaitingForHumanMessage3 += 1
             else:
                 self._timeWaitingForHumanMessage4 += 1
             self._saveData(self._tick)
 
         if (not self._isWaitingForHumanMessage and self._isWaitingForHumanToCome):
-            if (self._tick < 1100):
+            if (self._tick < 1200):
                 self._timeWaitingForHumanToCome1 += 1
-            elif (self._tick >= 1100 and self._tick < 2000):
+            elif (self._tick >= 1200 and self._tick < 2400):
                 self._timeWaitingForHumanToCome2 += 1
-            elif (self._tick >= 2000 and self._tick < 2900):
+            elif (self._tick >= 2400 and self._tick < 3600):
                 self._timeWaitingForHumanToCome3 += 1
             else:
                 self._timeWaitingForHumanToCome4 += 1
@@ -1041,36 +1039,35 @@ class OfficialAgent(ArtificialBrain):
             # "my prediction was correct")
 
             # before the message by RescueBot that his advice was correct
-            if(current_tick <= 1100):
+            if(current_tick <= 1200):
                 time1 = current_tick
                 csv_writer.writerow([self._timeWaitingForHumanToCome1 / time1, -1,-1,-1,
                                      self._timeWaitingForHumanMessage1 / time1,-1,-1,-1])
             # between the first and second message sent by RescueBot regarding his prediction
-            elif(current_tick > 1100 and current_tick <= 2000):
-                time1 = 1100
-                time2 = current_tick - 1100
+            elif(current_tick > 1200 and current_tick <= 2400):
+                time1 = 1200
+                time2 = current_tick - 1200
                 csv_writer.writerow([self._timeWaitingForHumanToCome1 / time1, self._timeWaitingForHumanToCome2 / time2, -1, -1,
                                      self._timeWaitingForHumanMessage1 / time1, self._timeWaitingForHumanMessage2 / time2, -1, -1])
             # between the second and third message sent by RescueBot regarding his prediction
-            elif (current_tick > 2000 and current_tick <= 2900):
-                time1 = 1100
-                time2 = 900
-                time3 = current_tick - 2000
+            elif (current_tick > 2400 and current_tick <= 3600):
+                time1 = 1200
+                time2 = 1200
+                time3 = current_tick - 2400
                 csv_writer.writerow(
                     [self._timeWaitingForHumanToCome1 / time1, self._timeWaitingForHumanToCome2 / time2, self._timeWaitingForHumanToCome3 / time3, -1,
                      self._timeWaitingForHumanMessage1 / time1, self._timeWaitingForHumanMessage2 / time2, self._timeWaitingForHumanMessage3 / time3, -1])
             # after the last message sent by RescueBot regarding his prediction
             else:
-                time1 = 1100
-                time2 = 900
-                time3 = 900
-                time4 = current_tick - 2900
+                time1 = 1200
+                time2 = 1200
+                time3 = 1200
+                time4 = current_tick - 3600
                 csv_writer.writerow(
                     [self._timeWaitingForHumanToCome1 / time1, self._timeWaitingForHumanToCome2 / time2,
                      self._timeWaitingForHumanToCome3 / time3, self._timeWaitingForHumanToCome4 / time4,
                      self._timeWaitingForHumanMessage1 / time1, self._timeWaitingForHumanMessage2 / time2,
                      self._timeWaitingForHumanMessage3 / time3, self._timeWaitingForHumanMessage4 / time4])
-
 
     def _sendMessage(self, mssg, sender):
         '''
