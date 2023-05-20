@@ -73,8 +73,18 @@ class RemoveObjectTogether(Action):
         objects_in_range.pop(agent_id)
         for obj in objects_in_range:  # loop through all objects in range
             # CURRENTLY FOR ROCK OR STONE BUT CAN BE EDITED
-            if obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'rock' in obj and condition!='baseline' or \
-            obj == object_id and get_distance(other_agent['location'], world_state[obj]['location'])<=remove_range and get_distance(other_human['location'], world_state[obj]['location'])<=remove_range and 'stone' in obj and condition!='baseline':  # if object is in that list
+            if obj == object_id and get_distance(other_agent['location'],
+                                                 world_state[obj]['location']) <= remove_range and get_distance(
+                    other_human['location'],
+                    world_state[obj]['location']) <= remove_range and 'rock' in obj and condition != 'baseline' or \
+                    obj == object_id and get_distance(other_agent['location'],
+                                                      world_state[obj]['location']) <= remove_range and get_distance(
+                other_human['location'],
+                world_state[obj]['location']) <= remove_range and 'stone' in obj and condition != 'baseline' or \
+                    obj == object_id and get_distance(other_agent['location'],
+                                                      world_state[obj]['location']) <= remove_range and get_distance(
+                other_human['location'],
+                world_state[obj]['location']) <= remove_range and 'tree' in obj and condition != 'baseline':
                 success = grid_world.remove_from_grid(object_id)  # remove it, success is whether GridWorld succeeded
                 if success:  # if we succeeded in removal return the appropriate ActionResult
                     return RemoveObjectResult(RemoveObjectResult.OBJECT_REMOVED.replace('object_id'.upper(),
@@ -133,7 +143,7 @@ class CarryObject(Action):
         condition = None if 'condition' not in kwargs else kwargs['condition']
         # EDIT BELOW TO ACCOUNT FOR YOUR CONDITION
         if object_id and 'critical' in object_id and condition!='baseline' and condition!='tutorial':
-            if condition == 'mixed':
+            if condition == 'mixed' or condition == 'opportunistic':
                 return _is_possible_grab(grid_world, agent_id=agent_id, object_id=object_id, grab_range=grab_range,
                                          max_objects=max_objects)
             return GrabObjectResult(GrabObjectResult.RESULT_OBJECT_UNMOVABLE, False)
