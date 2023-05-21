@@ -107,9 +107,9 @@ class OfficialAgent(ArtificialBrain):
         # Process messages from team members
         self._processMessages(state, self._teamMembers)
 
-        if (self._isWaitingForHumanMessage and self._messageWaitingTick < 600):
+        if (self._isWaitingForHumanMessage and self._messageWaitingTick < 300):
             self._messageWaitingTick += 1
-        if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 600):
+        if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 300):
             # message doesn't get sent when the message to be sent is identical to the message sent in the past.
             # so I just added extra exclamation mark each time.
             # I really tried to fix it but it just did not work but i think this should suffice.
