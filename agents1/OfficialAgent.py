@@ -843,7 +843,7 @@ class OfficialAgent(ArtificialBrain):
                 self._roomtiles = roomTiles
                 objects = []
                 # When the victim has to be carried by human and agent together, check whether human has arrived at the victim's location
-                if self._condition == 'required' or self._condition == 'mixed':
+                if self._condition == 'required' or self._condition == 'mixed' or (self._condition == 'opportunistic' and self._rescue == 'together'):
                     for info in state.values():
                         # When the victim has to be carried by human and agent together, check whether human has arrived at the victim's location
                         if 'class_inheritance' in info and 'CollectableBlock' in info[
