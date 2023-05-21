@@ -42,7 +42,7 @@ class ObjectAddingAgent(ArtificialBrain):
             self._sendMessage('I have detected extreme rain arriving soon and predict it will cause new floods, so I advise you to take shelter in one of the areas as soon as possible and until the rain is over.', 'RescueBot')
         
         if self._tick >= 1300 and self._tick < 1450: # self._tick >= 1050 and self._tick < 1100:
-            if self._score == state['objectadder']['score']:
+            if self._score <= state['objectadder']['score']:
                 self._sendMessage('My advice was correct, that weather was extreme! If you had not taken shelter, you would have lost important mission time due to injuries and 10 points of our score.', 'RescueBot')
             if self._score > state['objectadder']['score']:
                 self._sendMessage('My advice was correct, that weather was extreme! If you had taken shelter, you would not have lost important mission time due to injuries and 10 points of our score.', 'RescueBot')
@@ -57,7 +57,7 @@ class ObjectAddingAgent(ArtificialBrain):
             self._sendMessage('I have detected extreme rain arriving soon and predict it will cause new floods, so I again advise you to take shelter in one of the areas as soon as possible and until the rain is over.', 'RescueBot')
         
         if self._tick >= 3700 and self._tick < 3750: # self._tick >= 2850 and self._tick < 2900:
-            if self._score == state['objectadder']['score']:
+            if self._score <= state['objectadder']['score']:
                 self._sendMessage('My advice was correct now, that weather was extreme! If you had not taken shelter, you would have lost important mission time due to injuries and 10 points of our score.', 'RescueBot')
             if self._score > state['objectadder']['score']:
                 self._sendMessage('My advice was correct now, that weather was extreme! If you had taken shelter, you would not have lost important mission time due to injuries and 10 points of our score.', 'RescueBot')

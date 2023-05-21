@@ -106,6 +106,7 @@ class OfficialAgent(ArtificialBrain):
         return state
 
     def decide_on_actions(self, state):
+        # print(self._phase)
         # Provide suggestions
         self._tick = state['World']['nr_ticks']
         self._second = state['World']['tick_duration'] * state['World']['nr_ticks']
@@ -861,16 +862,16 @@ class OfficialAgent(ArtificialBrain):
                             objects.append(info)
                             # Remain idle when the human has not arrived at the location
                             if not 'human' in info['name']:
-                                self._waiting = True
-                                self._moving = False
-                                return None, {}
+                                    self._waiting = True
+                                    self._moving = False
+                                    return None, {}
                     # Add the victim to the list of rescued victims when it has been picked up
                     if (len(objects) == 0 and 'critical' in self._goalVic or len(
                             objects) == 0 and 'mild' in self._goalVic) and self._rescue == 'together':
+                        print("new goal finding")
                         self._waiting = False
                         if self._goalVic not in self._collectedVictims:
                             self._collectedVictims.append(self._goalVic)
-                        self._carryingTogether = True
                         # Determine the next victim to rescue or search
                         self._phase = Phase.FIND_NEXT_GOAL
 
