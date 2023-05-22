@@ -443,7 +443,7 @@ class OfficialAgent(ArtificialBrain):
                             -1] == 'Remove' or self._remove or self.received_messages_content and \
                                 self.received_messages_content[-1] == 'Remove alone':
                             self._isWaitingForHumanMessage = False
-                            if not self._remove and 'rock' in info['obj_id'] and self._condition == 'mixed':
+                            if not self._remove and 'rock' in info['obj_id'] and (self._condition == 'mixed'):
                                 self._answered = True
                                 self._waiting = False
                                 # Tell the human to come over and be idle until human arrives
@@ -458,6 +458,14 @@ class OfficialAgent(ArtificialBrain):
                                             self._door['room_name']) + '!', 'RescueBot')
                                     return None, {}
 
+                            if self._remove and 'rock' in info['obj_id'] and (self._condition == 'baseline'):
+                                self._sendMessage('Removing ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
+                                    self._door['room_name']) + ' because you asked me to.', 'RescueBot')
+                                self._phase = Phase.ENTER_ROOM
+                                self._remove = False
+                                return RemoveObject.__name__, {'object_id': info['obj_id'],
+                                                               'condition': self._condition}
+
                             if not self._remove:
                                 self._answered = True
                                 self._waiting = False
@@ -469,7 +477,7 @@ class OfficialAgent(ArtificialBrain):
                                 return RemoveObject.__name__, {'object_id': info['obj_id'],
                                                                'condition': self._condition}
 
-                            if self._remove and 'tree' in info['obj_id'] and self._condition == 'mixed':
+                            if self._remove and 'tree' in info['obj_id'] and (self._condition == 'mixed' or self._condition == 'baseline') :
                                 self._sendMessage('Removing ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
                                     self._door['room_name']) + ' because you asked me to.', 'RescueBot')
                                 self._phase = Phase.ENTER_ROOM
@@ -478,7 +486,7 @@ class OfficialAgent(ArtificialBrain):
                                                                'condition': self._condition}
 
                             if self._remove and ('stone' in info['obj_id'] or 'rock' in info[
-                                'obj_id']) and self._condition == 'mixed':
+                                'obj_id']) and (self._condition == 'mixed' or self._condition == 'baseline'):
                                 self._sendMessage(
                                     'Helping you remove ' + info['obj_id'].split('_')[0] + ' blocking ' + str(
                                         self._door['room_name']) + ' because you asked me to.', 'RescueBot')
