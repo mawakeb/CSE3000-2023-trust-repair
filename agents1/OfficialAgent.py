@@ -78,6 +78,7 @@ class OfficialAgent(ArtificialBrain):
         self._isWaitingForHumanMessage = False
         self._messageWaitingTick = 0
         self._reminderCount = 1
+        self._waitPhase = Phase.INTRO
 
     def initialize(self):
         # Initialization of the state tracker and navigation algorithm
@@ -106,6 +107,9 @@ class OfficialAgent(ArtificialBrain):
                     self._receivedMessages.append(mssg.content)
         # Process messages from team members
         self._processMessages(state, self._teamMembers)
+
+        if(self._isWaitingForHumanMessage and self._phase != self._waitPhase):
+            self._isWaitingForHumanMessage = False
 
         if (self._isWaitingForHumanMessage and self._messageWaitingTick < 300):
             self._messageWaitingTick += 1
@@ -219,6 +223,7 @@ class OfficialAgent(ArtificialBrain):
                             self._rescueWaitingSecond = self._second
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
+                            self._waitPhase = self._phase
 
                         if self._condition == 'baseline' or self._condition == 'complementary':
                             self._rescue = 'alone'
@@ -226,6 +231,7 @@ class OfficialAgent(ArtificialBrain):
                                 'room'] + ' to pick up ' + self._goalVic + '.', 'RescueBot')
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
+                            self._waitPhase = self._phase
 
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
@@ -252,6 +258,7 @@ class OfficialAgent(ArtificialBrain):
                             self._rescueWaitingSecond = self._second
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
+                            self._waitPhase = self._phase
                         # Plan path to victim because the exact location is known (i.e., the agent found this victim)
                         if 'location' in self._foundVictimLocs[vic].keys():
                             self._phase = Phase.PLAN_PATH_TO_VICTIM
@@ -429,6 +436,7 @@ class OfficialAgent(ArtificialBrain):
                             self._waiting = True
                             self._messageWaitingTick = 0
                             self._isWaitingForHumanMessage = True
+                            self._waitPhase = self._phase
                         # Determine the next area to explore if the human tells the agent not to remove the obstacle
                         if self.received_messages_content and self.received_messages_content[
                             -1] == 'Continue' and not self._remove:
@@ -618,6 +626,7 @@ class OfficialAgent(ArtificialBrain):
                                     self._waiting = True
                                     self._messageWaitingTick = 0
                                     self._isWaitingForHumanMessage = True
+                                    self._waitPhase = self._phase
 
                                 if self._condition == 'opportunistic' and self._answered == False and not self._waiting:
                                     self._sendMessage('Found ' + vic + ' in ' + self._door['room_name'] + '. Please decide whether to "Rescue together", "Rescue alone", or "Continue" searching. \
@@ -626,6 +635,7 @@ class OfficialAgent(ArtificialBrain):
                                     self._waiting = True
                                     self._messageWaitingTick = 0
                                     self._isWaitingForHumanMessage = True
+                                    self._waitPhase = self._phase
                     # Execute move actions to explore the area
                     return action, {}
 
