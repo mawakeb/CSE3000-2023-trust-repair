@@ -483,7 +483,7 @@ class CollectionGoal(WorldGoal):
         if human.properties['img_name'] == "/images/human-danger2.gif" and curr_tick not in self.__penalties:
             self.__penalties.append(curr_tick)
 
-        print(self.__penalties)
+        #print(self.__penalties)
 
         if 1299 in self.__penalties and 2499 in self.__penalties and 3699 in self.__penalties:
             penalty=30

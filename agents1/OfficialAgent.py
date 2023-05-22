@@ -107,9 +107,9 @@ class OfficialAgent(ArtificialBrain):
         # Process messages from team members
         self._processMessages(state, self._teamMembers)
 
-        if (self._isWaitingForHumanMessage and self._messageWaitingTick < 600):
+        if (self._isWaitingForHumanMessage and self._messageWaitingTick < 300):
             self._messageWaitingTick += 1
-        if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 600):
+        if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 300):
             # message doesn't get sent when the message to be sent is identical to the message sent in the past.
             # so I just added extra exclamation mark each time.
             # I really tried to fix it but it just did not work but i think this should suffice.
@@ -673,8 +673,8 @@ class OfficialAgent(ArtificialBrain):
                     self._phase = Phase.PLAN_PATH_TO_VICTIM
 
                 # MIXED condition -> rescue a found mildly injured victim together if the human decides so
-                if self.received_messages_content and self.received_messages_content[
-                    -1] == 'Rescue together' and 'mild' in self._recentVic and self._condition == 'mixed':
+                if self._condition == 'mixed' and self.received_messages_content and self.received_messages_content[
+                    -1] == 'Rescue together' and 'mild' in self._recentVic:
                     self._rescue = 'together'
                     self._answered = True
                     self._waiting = False
@@ -693,8 +693,8 @@ class OfficialAgent(ArtificialBrain):
                     self._phase = Phase.PLAN_PATH_TO_VICTIM
 
                 # MIXED condition -> rescue the mildly injured victim alone if the human decides so, and communicate this to the human
-                if self.received_messages_content and self.received_messages_content[
-                    -1] == 'Rescue alone' and 'mild' in self._recentVic and self._condition == 'mixed':
+                if self._condition == 'mixed' and self.received_messages_content and self.received_messages_content[
+                    -1] == 'Rescue alone' and 'mild' in self._recentVic:
                     self._sendMessage('Picking up ' + str(self._recentVic) + ' in ' + self._door['room_name'] + ' alone.',
                                       'RescueBot')
                     self._rescue = 'alone'
@@ -736,8 +736,8 @@ class OfficialAgent(ArtificialBrain):
                         self._rescue = 'alone'
                         self._rescueWaitingSecond = -1
                     # If human indicates that he is willing to help, ask him to come help the victim.
-                    if self.received_messages_content and self.received_messages_content[
-                        -1] == 'Rescue together' and self._condition == 'mixed':
+                    if self._condition == 'mixed' and self.received_messages_content and self.received_messages_content[
+                        -1] == 'Rescue together':
                         self._door = state.get_room_doors(self._foundVictimLocs[self._goalVic]['room'])[0]
                         self._rescue = 'together'
                         # Tell the human to come over and help carry the mildly injured victim
