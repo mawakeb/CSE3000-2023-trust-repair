@@ -157,11 +157,11 @@ class TutorialAgent(ArtificialBrain):
                     return None,{}
 
             if Phase.INTRO2==self._phase:
-                self._sendMessage('Lets move to area 3 now. When you are going to search an area, it is recommended to inform me about this.  \
-                You can do this using the button "03". This way, we can collaborate more efficiently. \
-                If you pressed the button "03" and moved to the area entrance, press the "Continue" button.', 'RescueBot')
+                self._sendMessage('Lets move to area 4 now. When you are going to search an area, it is recommended to inform me about this.  \
+                You can do this using the button "04". This way, we can collaborate more efficiently. \
+                If you pressed the button "04" and moved to the area entrance, press the "Continue" button.', 'RescueBot')
                 if self.received_messages_content and self.received_messages_content[-1]=='Continue':
-                    self._phase=Phase.INTRO3
+                    self._phase=Phase.INTRO7
                     self.received_messages_content=[]
                     self.received_messages=[]
                 else:
@@ -215,7 +215,7 @@ class TutorialAgent(ArtificialBrain):
                     return None,{}
 
             if Phase.INTRO7==self._phase:
-                self._sendMessage('Lets move to area 4 next. Remember to inform me about this. \
+                self._sendMessage('\
                 If you are in front of area 4, you see that it is blocked by tree. \
                 In this tutorial, let me remove tree for you. To do so, inform me that you need help with removing by using the button "Help remove" and selecting "at 04". \
                 I will then come over to remove tree for you.','RescueBot')
@@ -237,7 +237,7 @@ class TutorialAgent(ArtificialBrain):
                 Drop mildly injured elderly man by moving on top of the image and pressing "W" on your keyboard. \
                 If you completed these steps, press the "Continue" button.','RescueBot')
                 if self.received_messages_content and self.received_messages_content[-1]=='Continue':
-                    self._phase=Phase.INTRO9
+                    self._phase=Phase.INTRO10
                     self.received_messages_content=[]
                     self.received_messages=[]
                 else:
