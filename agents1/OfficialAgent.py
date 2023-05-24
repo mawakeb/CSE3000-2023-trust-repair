@@ -221,7 +221,7 @@ class OfficialAgent(ArtificialBrain):
                 # Send introduction message
                 self._sendMessage('Hello there, this is RescueBot again! Together we will collaborate during this task and try to search and rescue as many of the 8 victims on our right as possible. \
                 Each critical victim (critically injured girl/critically injured elderly woman/critically injured man/critically injured dog) adds 6 points to our score, \
-                each mild victim (mildly injured boy/mildly injured elderly man/mildly injured woman/mildly injured cat) 3 points. We will have 8 minutes for our mission. \
+                each mild victim (mildly injured boy/mildly injured elderly man/mildly injured woman/mildly injured cat) 3 points. We will have 10 minutes for our mission. \
                 If you are ready to begin our mission, you can simply start moving.', 'RescueBot')
                 # Wait until the human starts moving before going to the next phase, otherwise remain idle
                 if not state[{'is_human_agent': True}]:
@@ -302,7 +302,7 @@ class OfficialAgent(ArtificialBrain):
                             self._rescue = 'alone'
                         if self._condition == 'mixed':
                             self._sendMessage('Moving to ' + self._foundVictimLocs[vic][
-                                'room'] + ' to pick up ' + self._goalVic + '. Please decide whether you plan to "Rescue" or "Continue"',
+                                'room'] + ' to pick up ' + self._goalVic + '. Please decide whether want me to "Rescue" or "Continue"',
                                               'RescueBot')
                             self._rescueWaitingSecond = self._second
                             self._messageWaitingTick = 0
@@ -370,8 +370,7 @@ class OfficialAgent(ArtificialBrain):
                     # if human indicates to rescue alone or 30 seconds have passed since the message was sent,
                     # move to the room that the victim is in. Also announce that he will carry the victim alone.
                     if ((self.received_messages_content and self.received_messages_content[-1] == 'Rescue' and 'critical' not in self._goalVic
-                         or self.received_messages_content and self.received_messages_content[-1] == 'Rescue alone')
-                        or (self._second - self._rescueWaitingSecond > 10)) and self._condition == 'mixed':
+                         or self.received_messages_content and self.received_messages_content[-1] == 'Rescue alone')) and self._condition == 'mixed':
                         self._door = state.get_room_doors(self._foundVictimLocs[self._goalVic]['room'])[0]
                         self._sendMessage('Picking up ' + self._goalVic + ' in ' + self._door['room_name'] + ' alone.',
                                           'RescueBot')
@@ -379,6 +378,15 @@ class OfficialAgent(ArtificialBrain):
                         self._messageWaitingTick = 0
                         self._isWaitingForHumanMessage = False
                         self._rescueWaitingSecond = -1
+                    if (self.received_messages_content and self.received_messages_content[
+                            -1] == 'Continue' and 'critical' not in self._goalVic) and self._condition == 'mixed':
+                        self._messageWaitingTick = 0
+                        self._isWaitingForHumanMessage = False
+                        self._rescueWaitingSecond = -1
+                        self._todo.append(self._goalVic)
+                        self._goalVic = None
+                        self._phase = Phase.FIND_NEXT_GOAL
+                        return None, {}
                 self._navigator.reset_full()
                 # Switch to a different area when the human found a victim
                 if self._goalVic and self._goalVic in self._foundVictims and 'location' not in self._foundVictimLocs[
@@ -416,7 +424,7 @@ class OfficialAgent(ArtificialBrain):
                     self._state_tracker.update(state)
                     # Explain why the agent is moving to the specific area, either because it containts the current target victim or because it is the closest unsearched area
                     if self._goalVic in self._foundVictims and str(self._door['room_name']) == \
-                            self._foundVictimLocs[self._goalVic]['room'] and not self._remove:
+                            self._foundVictimLocs[self._goalVic]['room'] and not self._remove and self._condition != 'mixed':
                         # CAN BE EDITED TO BETTER FIT YOUR CONDITION E.G. "TO PICK UP TOGETHER WITH YOU"
                         self._sendMessage(
                                 'Moving to ' + str(self._door['room_name']) + ' to pick up ' + self._goalVic + '.',
