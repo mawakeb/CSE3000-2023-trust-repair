@@ -1,0 +1,2 @@
+completeness;score;no_ticks;agent_actions;human_actions;shelter1;shelter2;shelter3;idle1;idle2;idle3;idle4;human_sent_messages_nr1;human_sent_messages_nr2;human_sent_messages_nr3;human_sent_messages_nr4;number_joint_1;number_joint_2;number_joint_3;number_joint_4;number_alone_1;number_alone_2;number_alone_3;number_alone_4
+1.0;26;5826;369;382;True;False;True;0.52;0.7;0.49;0.5;3;5;4;15;2;5;6;14;0;0;0;0
