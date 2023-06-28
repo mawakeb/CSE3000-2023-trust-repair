@@ -126,15 +126,13 @@ class OfficialAgent(ArtificialBrain):
 
         if(self._isWaitingForHumanMessage and self._phase != self._waitPhase):
             self._isWaitingForHumanMessage = False
-        # for now I assume that human has come and help iff human is in the squares surrounding rescueBot.
-        #if(self._isWaitingForHumanToCome and state[self.agent_id]['location'] == state['human']['location']):
+        # It is assumed that human has come and help iff human arrives in the squares surrounding rescueBot.
         if (self._isWaitingForHumanToCome and state[{'is_human_agent': True}]):
             self._isWaitingForHumanToCome = False
 
-        if(self._tick == 1):
-            self._saveData(self._tick)
-
         # update information about arrival/message waiting if needed
+        if (self._tick == 1):
+            self._saveData(self._tick)
         if(self._isWaitingForHumanMessage and self._isWaitingForHumanToCome):
             if (self._tick <= 1200):
                self._timeWaitingForHumanMessage1 += 1
@@ -149,7 +147,6 @@ class OfficialAgent(ArtificialBrain):
                 self._timeWaitingForHumanMessage4 += 1
                 self._timeWaitingForHumanToCome4 += 1
             self._saveData(self._tick)
-
         if (self._isWaitingForHumanMessage and not self._isWaitingForHumanToCome):
             if (self._tick <= 1200):
                 self._timeWaitingForHumanMessage1 += 1
@@ -160,7 +157,6 @@ class OfficialAgent(ArtificialBrain):
             else:
                 self._timeWaitingForHumanMessage4 += 1
             self._saveData(self._tick)
-
         if (not self._isWaitingForHumanMessage and self._isWaitingForHumanToCome):
             if (self._tick < 1200):
                 self._timeWaitingForHumanToCome1 += 1
@@ -172,6 +168,7 @@ class OfficialAgent(ArtificialBrain):
                 self._timeWaitingForHumanToCome4 += 1
             self._saveData(self._tick)
 
+        # send a reminder message if no response after 30 seconds
         if (self._isWaitingForHumanMessage and self._messageWaitingTick < 300):
             self._messageWaitingTick += 1
         if (self._isWaitingForHumanMessage and self._messageWaitingTick >= 300):
@@ -181,7 +178,7 @@ class OfficialAgent(ArtificialBrain):
             temp_string = ''
             for i in range(0, self._reminderCount):
                 temp_string = temp_string + "!"
-                self._sendMessage('Do not forget to respond to my message above' + temp_string, 'RescueBot')
+            self._sendMessage('Do not forget to respond to my message above' + temp_string, 'RescueBot')
             self._reminderCount += 1
 
         # Check whether human is close in distance
@@ -206,10 +203,12 @@ class OfficialAgent(ArtificialBrain):
 
         # Check whether victims are currently being carried together by human and agent
         for info in state.values():
-            if 'is_human_agent' in info and 'human' in info['name'] and len(info['is_carrying']) > 0 and 'critical' in \
-                    info['is_carrying'][0]['obj_id'] or \
-                    'is_human_agent' in info and 'human' in info['name'] and len(info['is_carrying']) > 0 and 'mild' in \
-                    info['is_carrying'][0]['obj_id'] and self._rescue == 'together' and not self._moving:
+            if 'is_human_agent' in info and 'human' in info['name'] and len(
+                    info['is_carrying']) > 0 and 'critical' in info['is_carrying'][0]['obj_id']  \
+                    and self._rescue == 'together' and not self._moving or \
+                    'is_human_agent' in info and 'human' in info['name'] and len(
+                info['is_carrying']) > 0 and 'mild' in info['is_carrying'][0][
+                'obj_id'] and self._rescue == 'together' and not self._moving:
                 # If victim is being carried, add to collected victims memory
                 if info['is_carrying'][0]['img_name'][8:-4] not in self._collectedVictims:
                     self._collectedVictims.append(info['is_carrying'][0]['img_name'][8:-4])
@@ -723,6 +722,8 @@ class OfficialAgent(ArtificialBrain):
                     # Reset received messages (bug fix)
                     self.received_messages = []
                     self.received_messages_content = []
+                    # added: temporary bug fix
+                    self._phase = Phase.FIND_NEXT_GOAL
                 # Add the area to the list of searched areas
                 if self._door['room_name'] not in self._searchedRooms:
                     self._searchedRooms.append(self._door['room_name'])
